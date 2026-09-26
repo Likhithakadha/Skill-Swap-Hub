@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills — SkillSwap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ss.css">
+<link rel="stylesheet" href="hub.css">
+</head>
+<body>
+
+<div id="nav"></div>
+
+<main class="page">
+  <div class="wrap">
+    <div class="page-head">
+      <div class="grow">
+        <h1>Skills</h1>
+        <p>Choose a skill to see its mentors, or post an open request that every mentor of that skill can see.</p>
+      </div>
+      <div class="head-actions">
+        <input class="input search" id="q" type="search" placeholder="Search skills" aria-label="Search skills">
+      </div>
+    </div>
+
+    <div class="skill-cards" id="cards"></div>
+  </div>
+</main>
+
+<script src="sync.js"></script>
+<script src="ss.js"></script>
+<script src="hub.js"></script>
+<script>
+  var user = SS.guard(null);
+  if (user) {
+    SS.renderNav({ active: 'skills' });
+
+    function render() {
+      var q = document.getElementById('q').value.trim().toLowerCase();
+      var mentors = SS.teachers();
+      var mine = user.interests || [];
+
+      var list = SS.SKILLS.filter(function (s) { return !q || s.name.toLowerCase().indexOf(q) > -1 || s.blurb.toLowerCase().indexOf(q) > -1; });
+      document.getElementById('cards').innerHTML = list.length ? list.map(function (s) {
+        var n = mentors.filter(function (t) { return t.skill === s.name; }).length;
+        var wanted = mine.indexOf(s.name) > -1;
+        return '<article class="skill-card' + (wanted ? ' wanted' : '') + '">' +
+          '<div class="ic">' + SS.svg(s.icon) + '</div>' +
+          '<h3>' + SS.esc(s.name) + '</h3>' +
+          '<p>' + SS.esc(s.blurb) + '</p>' +
+          '<div class="count">' + n + ' mentor' + (n === 1 ? '' : 's') + (wanted ? ' · on your list' : '') + '</div>' +
+          '<div class="actions">' +
+          '<a class="btn btn-learner btn-sm" href="mentor.html?skill=' + encodeURIComponent(s.name) + '">Find mentors</a>' +
+          '<button class="btn btn-ghost btn-sm" data-skill="' + SS.esc(s.name) + '">Post a request</button>' +
+          '</div></article>';
+      }).join('') : '<div class="empty" style="grid-column:1/-1"><h3>No skill matches that</h3><p>Try a different word, like "design" or "english".</p></div>';
+    }
+
+    document.getElementById('q').addEventListener('input', render);
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-skill]');
+      if (b) SS.openRequestModal({ skill: b.dataset.skill });
+    });
+    render();
+  }
+</script>
+</body>
+</html>

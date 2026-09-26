@@ -1,0 +1,8 @@
+{
+  "name": "skill-swap-hub",
+  "version": "1.0.0",
+  "description": "Skill Swap Hub - learners and mentors",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
