@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor dashboard — SkillSwap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ss.css">
+<link rel="stylesheet" href="hub.css">
+</head>
+<body>
+
+<div id="nav"></div>
+
+<main class="page">
+  <div class="wrap">
+    <div class="page-head">
+      <span id="headAvatar"></span>
+      <div class="grow">
+        <h1 id="hello"></h1>
+        <p id="helloSub"></p>
+        <div style="margin-top:10px" id="badgeWrap"></div>
+      </div>
+      <div class="head-actions">
+        <a class="btn btn-mentor" href="network.html">Connect with mentors</a>
+      </div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="progress-card" id="progress"></div>
+
+    <div class="section-head"><h2>Learning requests for you</h2></div>
+    <div id="requests"></div>
+
+    <div class="section-head"><h2>Upcoming sessions</h2></div>
+    <div id="sessions"></div>
+
+    <div class="section-head"><h2>Mentors you could connect with</h2><a href="network.html">Open network</a></div>
+    <div class="people" id="suggest"></div>
+  </div>
+</main>
+
+<script src="sync.js"></script>
+<script src="ss.js"></script>
+<script src="hub.js"></script>
+<script>
+  var user = SS.guard('mentor');
+  if (user) {
+    SS.renderNav({ active: 'home' });
+
+    function render() {
+      user = SS.me();
+      var pending = SS.pendingForMentor(user);
+      var accepted = SS.acceptedForMentor(user);
+      var sessions = user.sessionsAccepted || 0;
+      var connected = SS.myConns(user.key);
+      var badge = SS.computeBadge(sessions);
+
+      document.getElementById('headAvatar').innerHTML = SS.avatar(user, 'xl');
+      document.getElementById('hello').textContent = 'Welcome, ' + user.name.split(' ')[0];
+      document.getElementById('helloSub').innerHTML = 'You teach ' + SS.skillIcon(user.skill).replace('class="ico"', 'class="ico" style="width:18px;height:18px;vertical-align:-3px"') + ' <strong>' + SS.esc(user.skill) + '</strong>.';
+      document.getElementById('badgeWrap').innerHTML = badge ? '<span class="badge-pill">' + badge + '</span>' : '';
+
+      document.getElementById('stats').innerHTML =
+        '<div class="stat is-mentor"><div class="num">' + pending.length + '</div><div class="label">Pending requests</div></div>' +
+        '<div class="stat is-mentor"><div class="num">' + sessions + '</div><div class="label">Sessions accepted</div></div>' +
+        '<div class="stat is-mentor"><div class="num">' + (user.points || 0) + '</div><div class="label">SkillPoints</div></div>' +
+        '<div class="stat is-mentor"><div class="num">' + connected.length + '</div><div class="label">Connections</div></div>';
+
+      // Progress to next badge
+      var target = sessions < 5 ? 5 : sessions < 15 ? 15 : null;
+      var nextName = sessions < 5 ? 'Rising Mentor' : 'Top Mentor';
+      document.getElementById('progress').innerHTML = target
+        ? '<strong>' + (target - sessions) + ' more session' + (target - sessions === 1 ? '' : 's') + ' to become a ' + nextName + '</strong>' +
+          '<div class="progress" role="progressbar" aria-valuenow="' + sessions + '" aria-valuemin="0" aria-valuemax="' + target + '"><span style="width:' + Math.min(100, sessions / target * 100) + '%"></span></div>'
+        : '<strong>You are a Top Mentor.</strong><p>Thank you for teaching. Keep the sessions going.</p>';
+
+      // Requests
+      document.getElementById('requests').innerHTML = pending.length ? pending.map(function (r) {
+        return '<div class="row-card"><div class="info">' +
+          '<div class="row-top"><span class="skill-tag">' + SS.skillIcon(r.skill) + SS.esc(r.skill) + '</span>' +
+          (r.mentorEmail ? '<span class="status status-pending">Asked you directly</span>' : '<span class="status status-cancelled">Open request</span>') + '</div>' +
+          '<h3>' + SS.esc(r.learnerName) + '</h3>' +
+          '<p>' + SS.esc(r.message || 'No message provided.') + '</p>' +
+          '<div class="meta">Requested ' + new Date(r.date).toLocaleDateString() + '</div></div>' +
+          '<div class="actions"><button class="btn btn-ok btn-sm" data-yes="' + r.id + '">Accept</button>' +
+          '<button class="btn btn-ghost btn-sm" data-no="' + r.id + '">Decline</button></div></div>';
+      }).join('') : '<div class="empty"><h3>No new requests</h3><p>When a learner asks for ' + SS.esc(user.skill) + ', it shows up here. You will also see requests sent to you directly.</p></div>';
+
+      // Sessions
+      document.getElementById('sessions').innerHTML = accepted.length ? accepted.map(function (r) {
+        return '<div class="row-card"><div class="info">' +
+          '<div class="row-top"><span class="status status-accepted">Confirmed</span></div>' +
+          '<h3>' + SS.esc(r.learnerName) + '</h3>' +
+          '<div class="link-line">Meeting link: <a href="' + SS.esc(r.meetLink) + '" target="_blank" rel="noopener">' + SS.esc(r.meetLink) + '</a></div></div>' +
+          '<div class="actions"><a class="btn btn-mentor btn-sm" href="' + SS.esc(r.meetLink) + '" target="_blank" rel="noopener">Join meeting</a></div></div>';
+      }).join('') : '<div class="empty"><h3>No sessions scheduled</h3><p>Accept a request above and the meeting link is created for you and the learner.</p></div>';
+
+      // Suggested mentors: prefer other skills, not yet connected
+      var others = SS.teachers().filter(function (t) { return t.email !== user.email; })
+        .map(function (t) { t.role = 'mentor'; t.key = SS.keyOf('mentor', t.email); return t; })
+        .filter(function (t) { return SS.connState(user.key, t.key).state === 'none'; })
+        .sort(function (a, b) { return (a.skill === user.skill) - (b.skill === user.skill); })
+        .slice(0, 3);
+      document.getElementById('suggest').innerHTML = others.length ? others.map(function (t) {
+        return SS.personCard(t, '<button class="btn btn-mentor btn-sm" data-connect="' + SS.esc(t.key) + '">Connect</button>');
+      }).join('') : '<div class="empty" style="grid-column:1/-1"><h3>You know everyone here</h3><p>New mentors will show up as they join.</p></div>';
+    }
+
+    document.addEventListener('click', function (e) {
+      var y = e.target.closest('[data-yes]');
+      if (y) { SS.respondRequest(y.dataset.yes, user, 'accepted'); SS.toast('Request updated.'); return render(); }
+      var n = e.target.closest('[data-no]');
+      if (n) { SS.respondRequest(n.dataset.no, user, 'declined'); SS.toast('Request declined.'); return render(); }
+      var c = e.target.closest('[data-connect]');
+      if (c) { if (SS.sendConnect(user.key, c.dataset.connect)) SS.toast('Connection request sent.'); render(); }
+    });
+
+    SS.startTick(render);
+    render();
+  }
+</script>
+</body>
+</html>
