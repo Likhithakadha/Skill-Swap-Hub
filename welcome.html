@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to Skill Swap Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ss.css">
+<link rel="stylesheet" href="hub.css">
+</head>
+<body class="wel-body">
+<div class="wel">
+  <header class="wel-top">
+    <a class="logo" id="logo" href="welcome.html"></a>
+    <nav class="wel-nav"><a href="#top" id="navHome"></a><a href="#explore" id="navExplore"></a></nav>
+    <span class="wel-actions">
+      <a class="btn btn-ghost-dark btn-sm" id="loginLink" href="auth.html?mode=login"></a>
+      <a class="btn btn-primary btn-sm" id="signupLink" href="auth.html?mode=signup"></a>
+      <select class="input wel-lang" id="lang" aria-label="Language" translate="no"></select>
+    </span>
+  </header>
+
+  <section id="top">
+    <h1 id="wTitle"></h1>
+    <div class="wel-cards" id="cards">
+      <section class="wel-card teach">
+        <h2 id="tTitle"></h2>
+        <a class="btn btn-mentor btn-lg" id="tBtn" href="auth.html?mode=login&role=mentor&from=welcome"></a>
+      </section>
+      <button type="button" class="swap-fab" id="swapBtn" aria-label="Swap Teach and Learn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h15M15 4l4 4-4 4"/><path d="M20 16H5M9 12l-4 4 4 4"/></svg>
+      </button>
+      <section class="wel-card learn">
+        <h2 id="lTitle"></h2>
+        <a class="btn btn-learner btn-lg" id="lBtn" href="auth.html?mode=login&role=learner&from=welcome"></a>
+      </section>
+    </div>
+  </section>
+
+  <section id="explore" class="wel-explore">
+    <h2 id="exTitle"></h2>
+    <div class="skill-strip" id="skillStrip"></div>
+  </section>
+</div>
+<script src="sync.js"></script>
+<script src="ss.js"></script>
+<script src="hub.js"></script>
+<script>
+  document.getElementById('logo').innerHTML = SS.logoMark() + '<span>Skill Swap Hub</span>';
+  document.getElementById('skillStrip').innerHTML = SS.SKILLS.map(function (k) {
+    return '<a class="skill-chip" title="' + SS.esc(k.blurb) + '" href="auth.html?mode=signup&role=learner&from=welcome"><span class="skill-emoji" aria-hidden="true">' + k.emoji + '</span><span>' + SS.esc(k.name) + '</span></a>';
+  }).join('');
+
+  document.getElementById('lang').innerHTML = SS.hub.LANGS.map(function (l) { return '<option value="' + l[0] + '">' + l[1] + '</option>'; }).join('');
+
+  function paint() {
+    var m = { wTitle: 'wTitle', tTitle: 'tTitle', tBtn: 'tBtn', lTitle: 'lTitle', lBtn: 'lBtn', loginLink: 'logIn', signupLink: 'signUp', navHome: 'home', navExplore: 'skills', exTitle: 'skills' };
+    Object.keys(m).forEach(function (id) { document.getElementById(id).textContent = SS.t(m[id]); });
+    document.getElementById('lang').value = SS.hub.prefs().lang;
+  }
+  document.getElementById('lang').onchange = function () { var p = SS.hub.prefs(); p.lang = this.value; SS.hub.savePrefs(p); paint(); };
+  document.getElementById('navHome').onclick = function (e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+
+  /* Swap: Teach and Learn trade places (FLIP animation) */
+  var cards = document.getElementById('cards'), reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.getElementById('swapBtn').onclick = function () {
+    var els = Array.prototype.slice.call(cards.querySelectorAll('.wel-card'));
+    var first = els.map(function (e) { return e.getBoundingClientRect(); });
+    cards.classList.toggle('swapped');
+    this.classList.toggle('flip');
+    if (reduce) return;
+    els.forEach(function (e, i) {
+      var last = e.getBoundingClientRect();
+      e.animate([{ transform: 'translate(' + (first[i].left - last.left) + 'px,' + (first[i].top - last.top) + 'px)' }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    });
+  };
+  paint();
+</script>
+</body>
+</html>

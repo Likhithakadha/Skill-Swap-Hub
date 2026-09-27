@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in or sign up — SkillSwap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ss.css">
+<link rel="stylesheet" href="hub.css">
+</head>
+<body>
+
+<div class="auth">
+  <!-- Left: changes with the chosen role -->
+  <aside class="auth-side" id="side" data-role="learner">
+    <div>
+      <a class="logo" href="index.html" id="sideLogo"></a>
+      <div style="margin-top:56px">
+        <h1 id="sideTitle"></h1>
+        <p class="lead" id="sideLead"></p>
+        <ul class="auth-points" id="sidePoints"></ul>
+      </div>
+    </div>
+    <a class="back" href="index.html">Back to home</a>
+  </aside>
+
+  <!-- Right: form -->
+  <main class="auth-main">
+    <div class="auth-card">
+      <p class="session-note" id="sessNote" hidden></p>
+      <h2 id="formTitle"></h2>
+      <p class="sub" id="formSub"></p>
+
+      <div class="role-pick" role="group" aria-label="Choose your role">
+        <button type="button" class="role-opt" data-role="learner" aria-pressed="true">
+          <span class="rico" id="rico1"></span>
+          <span><strong>Learner</strong><small>I want to learn</small></span>
+        </button>
+        <button type="button" class="role-opt" data-role="mentor" aria-pressed="false">
+          <span class="rico" id="rico2"></span>
+          <span><strong>Mentor</strong><small>I want to teach</small></span>
+        </button>
+      </div>
+
+      <div class="seg" role="tablist">
+        <button type="button" role="tab" id="tabLogin" data-mode="login">Log in</button>
+        <button type="button" role="tab" id="tabSignup" data-mode="signup">Sign up</button>
+      </div>
+
+      <!-- Log in -->
+      <form id="loginForm" novalidate>
+        <div class="field"><label for="liEmail">Email or mobile number</label>
+          <input class="input" type="text" id="liEmail" name="username" autocomplete="username" placeholder="you@gmail.com or 9876543210"></div>
+        <div class="field"><label for="liPassword">Password</label>
+          <div class="pw-wrap"><input class="input" type="password" id="liPassword" name="password" autocomplete="current-password" placeholder="Your password"><button type="button" class="pw-toggle" aria-label="Show password"></button></div></div>
+        <div class="row-between"><label class="remember"><input type="checkbox" id="liRemember"> Remember me</label></div>
+        <button type="submit" class="btn btn-primary btn-block btn-submit" id="loginBtn">Log in</button>
+        <p class="msg" id="loginMsg" role="alert"></p>
+      </form>
+
+      <!-- Sign up -->
+      <form id="signupForm" novalidate hidden>
+        <div class="field"><label for="suName">Full name</label>
+          <input class="input" type="text" id="suName" autocomplete="name" placeholder="Your name"></div>
+        <div class="field"><label for="suEmail">Email</label>
+          <input class="input" type="email" id="suEmail" autocomplete="email" placeholder="you@example.com"></div>
+        <div class="field"><label for="suPhone">Mobile number</label>
+          <input class="input" type="tel" id="suPhone" autocomplete="tel" placeholder="10-digit mobile number"></div>
+        <div class="field"><label for="suPassword">Password</label>
+          <div class="pw-wrap"><input class="input" type="password" id="suPassword" autocomplete="new-password" placeholder="8+ characters with letters and a number"><button type="button" class="pw-toggle" aria-label="Show password"></button></div></div>
+
+        <!-- Learner only -->
+        <div class="field" data-for="learner">
+          <span class="label">What do you want to learn?</span>
+          <div class="pick-chips" id="interestChips"></div>
+          <p class="hint">Pick one or more. You can still explore every skill later.</p>
+        </div>
+        <div class="field" data-for="learner">
+          <label for="suGoal">Your goal (optional)</label>
+          <textarea class="input" id="suGoal" placeholder="For example: get comfortable speaking in interviews."></textarea>
+        </div>
+
+        <!-- Mentor only -->
+        <div class="field" data-for="mentor" hidden>
+          <label for="suSkill">Skill you will teach</label>
+          <select class="input" id="suSkill"><option value="" disabled selected>Select a skill</option></select>
+        </div>
+        <div class="field" data-for="mentor" hidden>
+          <label for="suBio">Short bio (optional)</label>
+          <textarea class="input" id="suBio" placeholder="Tell learners about your experience."></textarea>
+        </div>
+
+        <!-- Avatar -->
+        <div class="field">
+          <span class="label">Profile picture</span>
+          <div class="avatar-tabs">
+            <button type="button" class="avatar-tab on" data-mode="initial">Use initial</button>
+            <button type="button" class="avatar-tab" data-mode="preset">Choose avatar</button>
+            <button type="button" class="avatar-tab" data-mode="photo">Upload photo</button>
+          </div>
+          <div class="avatar-row">
+            <span class="avatar avatar-preview" id="avatarPreview"></span>
+            <div style="flex:1">
+              <div id="presetGrid" class="preset-grid" hidden></div>
+              <input type="file" id="photoInput" accept="image/*" hidden>
+              <label for="photoInput" class="btn btn-ghost btn-sm" id="photoBtn" hidden style="cursor:pointer">Choose a photo</label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-submit" id="signupBtn">Create account</button>
+        <p class="msg" id="signupMsg" role="alert"></p>
+      </form>
+
+      <div id="gWrap"><div class="or">or</div><div id="gBtn"></div></div>
+      <p class="auth-switch" id="switchLine"></p>
+    </div>
+  </main>
+</div>
+
+<script src="sync.js"></script>
+<script src="ss.js"></script>
+<script src="hub.js"></script>
+<script>
+  /* ---------- copy for each role ---------- */
+  var COPY = {
+    learner: {
+      title: 'Find someone who can teach you.',
+      lead: 'Learners get a dashboard, skill pages and mentor profiles built around what they want to learn.',
+      points: ['Browse mentors for each skill', 'Request a session and track its status', 'Connect with mentors and other learners']
+    },
+    mentor: {
+      title: 'Share a skill. Meet people who want it.',
+      lead: 'Mentors get a dashboard for requests and sessions, plus a network of other mentors.',
+      points: ['See requests for the skill you teach', 'Accept with one click and get a meeting link', 'Connect with other mentors and message them']
+    }
+  };
+
+  var params = new URLSearchParams(location.search);
+  var role = params.get('role') === 'mentor' ? 'mentor' : 'learner';
+  var mode = params.get('mode') === 'signup' ? 'signup' : 'login';
+  var gEmail = null;
+  function el(i) { return document.getElementById(i); }
+
+  // Already signed in? Go straight to the right dashboard.
+  var current = SS.me();
+  
+
+  /* ---------- static bits ---------- */
+  if (current) {
+    var sn = document.getElementById('sessNote'); sn.hidden = false;
+    sn.innerHTML = 'Signed in as <b>' + SS.esc(current.name) + '</b> (' + (current.role === 'mentor' ? 'teacher' : 'learner') + '). <a href="' + SS.homeFor(current.role) + '">Continue</a> or log in below to switch.';
+  }
+  document.getElementById('sideLogo').innerHTML = SS.logoMark() + '<span>SkillSwap</span>';
+  document.getElementById('rico1').innerHTML = SS.svg(SS.ICON.learner);
+  document.getElementById('rico2').innerHTML = SS.svg(SS.ICON.mentor);
+
+  var chipBox = document.getElementById('interestChips');
+  var skillSel = document.getElementById('suSkill');
+  SS.SKILLS.forEach(function (s) {
+    chipBox.insertAdjacentHTML('beforeend', '<label><input type="checkbox" value="' + SS.esc(s.name) + '"><span>' + SS.esc(s.name) + '</span></label>');
+    var o = document.createElement('option'); o.value = s.name; o.textContent = s.name; skillSel.appendChild(o);
+  });
+
+  /* ---------- role & mode switching ---------- */
+  function paint() {
+    var c = COPY[role];
+    var side = document.getElementById('side');
+    side.dataset.role = role;
+    document.getElementById('sideTitle').textContent = c.title;
+    document.getElementById('sideLead').textContent = c.lead;
+    document.getElementById('sidePoints').innerHTML = c.points.map(function (p) { return '<li>' + SS.svg(SS.ICON.check) + '<span>' + p + '</span></li>'; }).join('');
+
+    document.querySelectorAll('.role-opt').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.role === role); });
+    document.querySelectorAll('[data-for]').forEach(function (el) { el.hidden = el.dataset.for !== role; });
+
+    var isLogin = mode === 'login';
+    document.getElementById('loginForm').hidden = !isLogin;
+    document.getElementById('signupForm').hidden = isLogin;
+    document.getElementById('tabLogin').classList.toggle('on', isLogin);
+    document.getElementById('tabSignup').classList.toggle('on', !isLogin);
+    document.getElementById('tabLogin').setAttribute('aria-selected', isLogin);
+    document.getElementById('tabSignup').setAttribute('aria-selected', !isLogin);
+
+    var rn = role === 'mentor' ? 'mentor' : 'learner';
+    document.getElementById('formTitle').textContent = isLogin ? 'Welcome back' : 'Create your ' + rn + ' account';
+    document.getElementById('formSub').textContent = isLogin
+      ? 'Log in as a ' + rn + ' to continue.'
+      : (role === 'mentor' ? 'Tell learners what you teach.' : 'Tell us what you want to learn.');
+
+    var btnClass = role === 'mentor' ? 'btn btn-mentor btn-block btn-submit' : 'btn btn-learner btn-block btn-submit';
+    document.getElementById('loginBtn').className = btnClass;
+    document.getElementById('signupBtn').className = btnClass;
+    document.getElementById('loginBtn').textContent = 'Log in as ' + rn;
+    document.getElementById('signupBtn').textContent = 'Create ' + rn + ' account';
+
+    document.getElementById('switchLine').innerHTML = isLogin
+      ? 'New to SkillSwap? <button type="button" data-go="signup">Create an account</button>'
+      : 'Already have an account? <button type="button" data-go="login">Log in</button>';
+
+    document.getElementById('loginMsg').textContent = '';
+    document.getElementById('signupMsg').textContent = '';
+    renderAvatarPreview();
+    history.replaceState(null, '', 'auth.html?mode=' + mode + '&role=' + role);
+  }
+
+  document.querySelectorAll('.role-opt').forEach(function (b) { b.onclick = function () { role = b.dataset.role; paint(); }; });
+  document.querySelectorAll('.seg button').forEach(function (b) { b.onclick = function () { mode = b.dataset.mode; paint(); }; });
+  document.getElementById('switchLine').addEventListener('click', function (e) {
+    var g = e.target.dataset && e.target.dataset.go;
+    if (g) { mode = g; paint(); }
+  });
+
+  /* ---------- avatar picker ---------- */
+  var PRESETS = ['🧑‍🏫', '👩‍💻', '👨‍🎨', '🧑‍🎓', '👩‍🔬', '👨‍🍳', '🧑‍🚀', '👩‍🎤'];
+  var avatarMode = 'initial', avatarValue = null;
+
+  function renderAvatarPreview() {
+    var p = document.getElementById('avatarPreview');
+    var name = document.getElementById('suName').value.trim();
+    if (avatarMode === 'photo' && avatarValue) { p.style.background = 'transparent'; p.innerHTML = '<img src="' + avatarValue + '" alt="">'; }
+    else if (avatarMode === 'preset' && avatarValue) { p.style.background = '#3B3378'; p.textContent = avatarValue; }
+    else { p.style.background = SS.colorFor(name || 'S'); p.textContent = name ? name.charAt(0).toUpperCase() : 'S'; }
+  }
+
+  function setAvatarMode(m) {
+    avatarMode = m;
+    document.querySelectorAll('.avatar-tab').forEach(function (t) { t.classList.toggle('on', t.dataset.mode === m); });
+    document.getElementById('presetGrid').hidden = m !== 'preset';
+    document.getElementById('photoBtn').hidden = m !== 'photo';
+    if (m === 'initial') avatarValue = null;
+    renderAvatarPreview();
+  }
+  document.querySelectorAll('.avatar-tab').forEach(function (t) { t.onclick = function () { setAvatarMode(t.dataset.mode); }; });
+
+  var grid = document.getElementById('presetGrid');
+  PRESETS.forEach(function (emoji) {
+    var d = document.createElement('div');
+    d.className = 'preset-opt'; d.textContent = emoji;
+    d.onclick = function () {
+      avatarValue = emoji;
+      grid.querySelectorAll('.preset-opt').forEach(function (o) { o.classList.remove('sel'); });
+      d.classList.add('sel'); renderAvatarPreview();
+    };
+    grid.appendChild(d);
+  });
+
+  document.getElementById('photoInput').addEventListener('change', function (e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (evt) {
+      var img = new Image();
+      img.onload = function () {
+        var size = 160, canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size;
+        var scale = Math.max(size / img.width, size / img.height), sw = size / scale, sh = size / scale;
+        canvas.getContext('2d').drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, 0, 0, size, size);
+        avatarValue = canvas.toDataURL('image/jpeg', 0.8); renderAvatarPreview();
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('suName').addEventListener('input', renderAvatarPreview);
+
+  /* ---------- sign up ---------- */
+  function say(id, text, kind) { var el = document.getElementById(id); el.textContent = text; el.className = 'msg ' + kind; }
+
+  document.getElementById('signupForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('suName').value.trim();
+    var email = document.getElementById('suEmail').value.trim().toLowerCase();
+    var password = document.getElementById('suPassword').value;
+
+    if (!name || !email || !password) return say('signupMsg', 'Please fill in your name, email and password.', 'error');
+    if (!SS.validEmail(email)) return say('signupMsg', 'Enter a real email address, for example name@gmail.com.', 'error');
+    if (gEmail && gEmail !== email) return say('signupMsg', 'Use the Google email you verified.', 'error');
+    var phone = el('suPhone').value.trim();
+    if (!SS.validPhone(phone)) return say('signupMsg', 'Enter a valid 10-digit mobile number.', 'error');
+    if (SS.findByPhone(role, phone)) return say('signupMsg', 'This mobile number is already used by another account.', 'error');
+    if (!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password)) return say('signupMsg', 'Password needs 8+ characters with letters and a number.', 'error');
+    if (SS.findUser(role, email)) return say('signupMsg', 'A ' + role + ' account with this email already exists. Log in instead.', 'error');
+
+    var base = {
+      id: role + '_' + Date.now(), name: name, email: email, phone: phone, password: password,
+      avatarType: avatarMode, avatarValue: avatarMode === 'initial' ? null : avatarValue,
+      joined: new Date().toISOString()
+    };
+
+    if (role === 'mentor') {
+      var skill = document.getElementById('suSkill').value;
+      if (!skill) return say('signupMsg', 'Choose the skill you will teach.', 'error');
+      base.skill = skill; base.bio = document.getElementById('suBio').value.trim();
+      base.points = 0; base.sessionsAccepted = 0; base.badge = null;
+      var t = SS.teachers(); t.push(base); SS.saveTeachers(t);
+    } else {
+      var picked = Array.prototype.map.call(chipBox.querySelectorAll('input:checked'), function (i) { return i.value; });
+      if (!picked.length) return say('signupMsg', 'Pick at least one skill you want to learn.', 'error');
+      base.interests = picked; base.goal = document.getElementById('suGoal').value.trim();
+      var l = SS.learners(); l.push(base); SS.saveLearners(l);
+    }
+
+    SS.setSession(role, email);
+    SS.seedWelcomeRequest(SS.me());
+    say('signupMsg', 'Account created. Taking you to your dashboard…', 'ok');
+    setTimeout(function () { location.href = SS.homeFor(role); }, 600);
+  });
+
+  /* ---------- log in ---------- */
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var idf = el('liEmail').value.trim().toLowerCase(), email = idf;
+    var password = el('liPassword').value;
+    if (!idf || !password) return say('loginMsg', 'Enter your email or mobile number and your password.', 'error');
+    if (idf.indexOf('@') < 0) { var pu = SS.findByPhone(role, idf); email = pu ? pu.email : idf; }
+    else if (!SS.validEmail(idf)) return say('loginMsg', 'Enter a valid email address.', 'error');
+    SS._locked = false;
+    var u = SS.findUser(role, email);
+    if (!u || !SS.checkLogin(role, email, password)) {
+      if (SS._locked) return say('loginMsg', 'Too many wrong attempts. Try again in 10 minutes.', 'error');
+      var other = role === 'mentor' ? 'learner' : 'mentor';
+      var o = SS.findUser(other, email);
+      if (!u && o) return say('loginMsg', 'This email is registered as a ' + other + '. Switch to ' + other + ' above.', 'error');
+      return say('loginMsg', 'Incorrect email or password for a ' + role + ' account.', 'error');
+    }
+    try { if (el('liRemember').checked) localStorage.setItem('ssh_remember', idf); else localStorage.removeItem('ssh_remember'); } catch (e) {}
+    SS.setSession(role, email);
+    say('loginMsg', 'Welcome back. Redirecting…', 'ok');
+    setTimeout(function () { location.href = SS.homeFor(role); }, 400);
+  });
+
+  /* ---------- remember me, Google ---------- */
+  try { var rm = localStorage.getItem('ssh_remember'); if (rm) { el('liEmail').value = rm; el('liRemember').checked = true; } } catch (e) {}
+  function post(u, o) { return fetch(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(o) }).then(function (r) { return r.json(); }); }
+
+  /* ---------- show/hide password ---------- */
+  var EYE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var EYE_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.6 19.6 0 0 1 4.22-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a19.7 19.7 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+  document.querySelectorAll('.pw-toggle').forEach(function (btn) {
+    btn.innerHTML = EYE;
+    var input = btn.previousElementSibling;
+    btn.onclick = function () {
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.innerHTML = show ? EYE_OFF : EYE;
+      btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    };
+  });
+
+  function onGoogle(resp) {
+    var box = mode === 'login' ? 'loginMsg' : 'signupMsg';
+    post('/api/google', { credential: resp.credential }).then(function (g) {
+      if (!g.ok) return say(box, 'Google could not verify you. Please try again.', 'error');
+      if (SS.findUser(role, g.email)) { SS.setSession(role, g.email); location.href = SS.homeFor(role); return; }
+      mode = 'signup'; gEmail = g.email; paint();
+      el('suName').value = g.name; el('suEmail').value = g.email; el('suEmail').readOnly = true;
+      el('suPassword').value = Array.prototype.join.call(crypto.getRandomValues(new Uint32Array(6)), '-') + 'aA1';
+      el('suPassword').closest('.field').hidden = true; renderAvatarPreview();
+      say('signupMsg', 'Google verified ' + g.email + '. Add your mobile number and finish signing up.', 'ok');
+    });
+  }
+  fetch('/api/config').then(function (r) { return r.json(); }).then(function (cfg) {
+    var box = el('gBtn');
+    if (!cfg.google) {
+      box.innerHTML = '<button type="button" class="btn btn-ghost btn-block" id="gOff">Continue with Google</button>';
+      el('gOff').onclick = function () { say(mode === 'login' ? 'loginMsg' : 'signupMsg', 'Google sign-in is not switched on yet. The site owner needs to set GOOGLE_CLIENT_ID on the server.', 'error'); };
+      return;
+    }
+    var sc = document.createElement('script'); sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true;
+    sc.onload = function () { google.accounts.id.initialize({ client_id: cfg.google, callback: onGoogle }); google.accounts.id.renderButton(box, { theme: 'outline', size: 'large', text: 'continue_with', width: 320 }); };
+    document.head.appendChild(sc);
+  }).catch(function () { el('gWrap').hidden = true; });
+
+  paint();
+</script>
+</body>
+</html>
