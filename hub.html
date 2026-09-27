@@ -226,6 +226,7 @@ if (user) {
     H.savePrefs(p); SS.renderNav({ active: tab }); SS.toast('Saved.'); render();
   });
   route();
+  SS.startTick(route);
 }
 </script>
 <script>
